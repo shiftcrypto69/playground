@@ -1,0 +1,63 @@
+/* style.css */
+
+:root {
+    --bg-color: #1a3055;       /* Biru gelap latar belakang */
+    --card-color: #f9f4e8;     /* Warna krim/putih gading kad */
+    --dot-color: #7a8c82;      /* Warna hijau pudar untuk titik navigasi */
+    --text-color: #ffffff;      /* Warna teks untuk kapsyen */
+    --shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    background-color: var(--bg-color);
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* Bekas Utama */
+.container {
+    text-align: center;
+}
+
+/* Kad Mockup UI */
+.mockup-card {
+    background-color: var(--card-color);
+    width: 320px;
+    height: 400px;
+    border-radius: 25px; /* Penjuru membulat seperti dalam gambar */
+    box-shadow: var(--shadow); /* Kesan bayang terapung */
+    position: relative;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Bahagian Titik Navigasi */
+.browser-dots {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 20px;
+}
+
+.dot {
+    width: 12px;
+    height: 12px;
+    background-color: var(--dot-color);
+    border-radius: 50%;
+}
+
+/* Label Teks di Bawah */
+.label {
+    margin-top: 30px;
+    color: var(--text-color);
+    letter-spacing: 2px;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    opacity: 0.8;
+}
