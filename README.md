@@ -79,5 +79,3 @@ Ingin memberi saran atau memperbaiki bug di salah satu eksperimen saya? Silakan 
 *Dibuat dengan ❤️ oleh [ShiftDev.Js]*
 
 ---
-
-**Apakah Anda ingin saya menambahkan bagian "Tech Stack" khusus yang merinci library apa saja yang digunakan dalam Editor (seperti Monaco Editor atau Prism.js)?**
