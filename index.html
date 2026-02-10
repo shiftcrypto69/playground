@@ -3,54 +3,140 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-    
-    <title>Modern UI Mockup | Minimalist Design</title>
-    <meta name="description" content="Ilustrasi tetingkap UI minimalis di atas latar belakang biru gelap." />
+    <title>Playground AI | Modern Dashboard Mockup</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
-    
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;800&display=swap" rel="stylesheet">
+
     <style>
         :root {
-            --bg-deep-blue: #1A365D;
+            --bg-dark: #0f172a;
+            --sidebar-bg: #1e293b;
             --off-white: #FAF9F6;
+            --accent-blue: #3b82f6;
             --dot-color: #A0AEC0;
+            --text-muted: rgba(255, 255, 255, 0.5);
         }
 
         body {
-            background-color: var(--bg-deep-blue);
+            background-color: var(--bg-dark);
             margin: 0;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            font-family: 'Inter', sans-serif;
+            color: white;
             overflow: hidden;
+            height: 100vh;
         }
 
-        /* Kad Utama (Mockup Tetingkap) */
-        .canvas {
-            width: 300px;
-            height: 400px;
-            background-color: var(--off-white);
-            /* Penjuru membulat besar seperti dalam gambar */
-            border-radius: 30px; 
-            /* Bayang yang lebih lembut dan dalam (depth) */
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        .dashboard {
+            display: flex;
+            height: 100vh;
+            width: 100vw;
+        }
+
+        /* --- SIDEBAR --- */
+        .sidebar {
+            width: 280px;
+            background-color: var(--sidebar-bg);
+            border-right: 1px solid rgba(255, 255, 255, 0.1);
             display: flex;
             flex-direction: column;
             padding: 24px;
-            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            z-index: 10;
+        }
+
+        .sidebar-header .logo {
+            font-size: 1.8rem;
+            font-weight: 800;
+            color: var(--accent-blue);
+            margin-bottom: 40px;
+            letter-spacing: -1px;
+        }
+
+        .setting-group {
+            margin-bottom: 24px;
+        }
+
+        .setting-group label {
+            display: block;
+            font-size: 0.7rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            margin-bottom: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .setting-group select, .setting-group input[type="range"] {
+            width: 100%;
+            background: #0f172a;
+            border: 1px solid #334155;
+            color: white;
+            padding: 10px;
+            border-radius: 8px;
+            outline: none;
+        }
+
+        .size-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+        }
+
+        .size-box {
+            background: #0f172a;
+            padding: 12px 5px;
+            text-align: center;
+            font-size: 0.75rem;
+            border-radius: 8px;
             cursor: pointer;
+            border: 1px solid #334155;
+            transition: 0.2s;
         }
 
-        .canvas:hover {
-            transform: translateY(-10px) scale(1.02);
-            box-shadow: 0 35px 60px -15px rgba(0, 0, 0, 0.6);
+        .size-box.active {
+            border-color: var(--accent-blue);
+            background: rgba(59, 130, 246, 0.1);
+            color: var(--accent-blue);
         }
 
-        /* Elemen Tiga Titik Navigasi */
-        .browser-header {
+        .btn-pro {
+            margin-top: auto;
+            background: linear-gradient(45deg, #3b82f6, #8b5cf6);
+            border: none;
+            padding: 12px;
+            border-radius: 10px;
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+            transition: opacity 0.3s;
+        }
+
+        /* --- MAIN CONTENT & CANVAS --- */
+        .main-content {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: radial-gradient(circle at center, #1e293b 0%, #0f172a 100%);
+            position: relative;
+        }
+
+        .mockup-card {
+            background-color: var(--off-white);
+            width: 100%;
+            max-width: 450px;
+            height: 550px;
+            border-radius: 35px;
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 40px 80px -15px rgba(0, 0, 0, 0.6);
+            transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        /* Estetika Browser Dots */
+        .browser-dots {
             display: flex;
             gap: 8px;
             margin-bottom: 20px;
@@ -64,43 +150,183 @@
             opacity: 0.6;
         }
 
-        /* Label di bawah kad */
+        /* Area Imej Generatif */
+        .image-area {
+            flex-grow: 1;
+            background: #e5e7eb;
+            border-radius: 20px;
+            margin-bottom: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: #64748b;
+            overflow: hidden;
+            border: 1px dashed rgba(0,0,0,0.1);
+            position: relative;
+        }
+
+        /* Prompt Bar Styles */
+        .prompt-bar {
+            display: flex;
+            gap: 12px;
+            background: white;
+            padding: 8px;
+            border-radius: 18px;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.05);
+            border: 1px solid #e2e8f0;
+        }
+
+        .prompt-bar input {
+            flex-grow: 1;
+            border: none;
+            outline: none;
+            padding: 10px 15px;
+            color: #1e293b;
+            font-size: 0.9rem;
+        }
+
+        .prompt-bar button {
+            background: var(--bg-dark);
+            color: white;
+            border: none;
+            padding: 10px 24px;
+            border-radius: 12px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: transform 0.2s;
+        }
+
+        .prompt-bar button:active { transform: scale(0.95); }
+
         .label {
-            margin-top: 40px;
-            color: rgba(255, 255, 255, 0.5);
+            margin-top: 30px;
+            color: var(--text-muted);
             font-size: 0.75rem;
             letter-spacing: 0.2em;
             text-transform: uppercase;
-            font-weight: 500;
         }
 
-        /* Garis halus hiasan (optional - untuk nampak lebih pro) */
-        .content-placeholder {
-            width: 100%;
-            height: 10px;
-            background: rgba(0,0,0,0.03);
-            border-radius: 5px;
-            margin-top: auto;
+        /* Loader Animation */
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid rgba(59, 130, 246, 0.1);
+            border-top-color: var(--accent-blue);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
         }
+
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .hidden { display: none; }
+
     </style>
 </head>
 <body>
 
-    <div class="canvas">
-        <div class="browser-header">
-            <div class="dot"></div>
-            <div class="dot"></div>
-            <div class="dot"></div>
+<div class="dashboard">
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <div class="logo">Playground</div>
         </div>
         
-        <div class="content-placeholder"></div>
-    </div>
+        <div class="setting-group">
+            <label>AI Model</label>
+            <select>
+                <option>Nano Banana v1</option>
+                <option>Playground v3</option>
+                <option>Stable Diffusion XL</option>
+            </select>
+        </div>
 
-    <div class="label">Minimalist Mockup v2.0</div>
+        <div class="setting-group">
+            <label>Image Dimensions</label>
+            <div class="size-grid">
+                <div class="size-box active" onclick="setSize('1:1', this)">1:1</div>
+                <div class="size-box" onclick="setSize('4:3', this)">4:3</div>
+                <div class="size-box" onclick="setSize('16:9', this)">16:9</div>
+            </div>
+        </div>
 
-    <script>
-        console.log("Modern Minimalist UI Theme Loaded Successfully.");
-    </script>
+        <div class="setting-group">
+            <label>Guidance Scale: <span id="val-display">7</span></label>
+            <input type="range" min="1" max="20" value="7" oninput="document.getElementById('val-display').innerText = this.value">
+        </div>
+
+        <button class="btn-pro">Upgrade to Pro</button>
+    </aside>
+
+    <main class="main-content">
+        <div class="mockup-card" id="main-card">
+            <div class="browser-dots">
+                <div class="dot"></div>
+                <div class="dot"></div>
+                <div class="dot"></div>
+            </div>
+
+            <div id="image-display" class="image-area">
+                <div id="loader" class="hidden">
+                    <div class="spinner"></div>
+                    <p class="mt-4 text-sm font-medium">Generating magic...</p>
+                </div>
+                <p id="placeholder-text" class="px-10 text-center">Describe what you want to see and click generate</p>
+            </div>
+
+            <div class="prompt-bar">
+                <input type="text" id="user-prompt" placeholder="A futuristic city with neon lights..." />
+                <button id="generate-btn" onclick="generateImage()">Generate</button>
+            </div>
+        </div>
+        <p class="label">Minimalist Design v2.5 • Interactive</p>
+    </main>
+</div>
+
+<script>
+    function generateImage() {
+        const prompt = document.getElementById('user-prompt').value;
+        const loader = document.getElementById('loader');
+        const placeholder = document.getElementById('placeholder-text');
+        const display = document.getElementById('image-display');
+        const btn = document.getElementById('generate-btn');
+
+        if(!prompt) return alert("Sila masukkan huraian (prompt)!");
+
+        placeholder.classList.add('hidden');
+        loader.classList.remove('hidden');
+        display.style.backgroundImage = 'none';
+        btn.disabled = true;
+        btn.style.opacity = "0.5";
+
+        // Simulasi penjanaan imej (2 saat)
+        setTimeout(() => {
+            loader.classList.add('hidden');
+            const randomId = Math.floor(Math.random() * 1000);
+            display.style.backgroundImage = `url('https://picsum.photos/seed/${randomId}/800/800')`;
+            display.style.backgroundSize = 'cover';
+            display.style.backgroundPosition = 'center';
+            btn.disabled = false;
+            btn.style.opacity = "1";
+        }, 2000);
+    }
+
+    function setSize(ratio, element) {
+        // Tukar status butang aktif
+        document.querySelectorAll('.size-box').forEach(box => box.classList.remove('active'));
+        element.classList.add('active');
+
+        const card = document.getElementById('main-card');
+        if(ratio === '1:1') {
+            card.style.maxWidth = '450px';
+            card.style.height = '550px';
+        } else if(ratio === '4:3') {
+            card.style.maxWidth = '550px';
+            card.style.height = '500px';
+        } else if(ratio === '16:9') {
+            card.style.maxWidth = '700px';
+            card.style.height = '450px';
+        }
+    }
+</script>
 
 </body>
 </html>
