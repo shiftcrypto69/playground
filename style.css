@@ -1,67 +1,169 @@
-/* style.css - Versi Kemaskini Penuh */
+/* style.css - Versi Penuh: Dashboard Playground + Estetika Minimalis */
 
 :root {
-    /* Palet warna tepat mengikut gambar */
-    --bg-color: #1a3055;        /* Biru gelap (Deep Chakra) */
-    --card-color: #f9f4e8;      /* Krim / White Gading */
-    --dot-color: #7a8c82;       /* Hijau pudar / Sage */
-    --text-color: rgba(255, 255, 255, 0.6); /* Putih lutsinar untuk label */
-    
-    /* Bayang berlapis untuk kesan kedalaman yang realistik */
-    --shadow-deep: 0 20px 25px -5px rgba(0, 0, 0, 0.3), 
-                   0 10px 10px -5px rgba(0, 0, 0, 0.2);
-    
-    /* Animasi */
+    /* Palet Warna Gabungan */
+    --bg-dark: #0f172a;           /* Biru gelap Dashboard */
+    --sidebar-bg: #1e293b;        /* Biru kelabu Sidebar */
+    --bg-canvas: #1a3055;         /* Biru Deep Chakra (dari kod asal) */
+    --card-krim: #f9f4e8;         /* Warna krim kad asal */
+    --accent-blue: #3b82f6;       /* Biru utama butang */
+    --dot-color: #7a8c82;         /* Hijau Sage untuk titik navigasi */
+    --text-muted: #94a3b8;
+    --text-main: #f8fafc;
+
+    /* Kesan Bayang & Animasi */
+    --shadow-premium: 0 50px 100px -20px rgba(0, 0, 0, 0.5);
     --transition-smooth: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+}
+
+* {
+    box-sizing: border-box;
 }
 
 body {
     margin: 0;
     padding: 0;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background-color: var(--bg-dark);
+    color: var(--text-main);
+    overflow: hidden; /* Menghalang skrol luar untuk rasa aplikasi premium */
+    -webkit-font-smoothing: antialiased;
+}
+
+/* Susun Atur Dashboard Utama */
+.dashboard {
+    display: flex;
+    height: 100vh;
+    width: 100vw;
+}
+
+/* --- SIDEBAR KIRI --- */
+.sidebar {
+    width: 280px;
+    background-color: var(--sidebar-bg);
+    border-right: 1px solid rgba(255, 255, 255, 0.1);
+    display: flex;
+    flex-direction: column;
+    padding: 25px;
+    z-index: 10;
+}
+
+.sidebar-header .logo {
+    font-size: 1.6rem;
+    font-weight: 800;
+    color: var(--accent-blue);
+    margin-bottom: 40px;
+    letter-spacing: -1px;
+}
+
+.setting-group {
+    margin-bottom: 28px;
+}
+
+.setting-group label {
+    display: block;
+    font-size: 0.7rem;
+    font-weight: 600;
+    color: var(--text-muted);
+    margin-bottom: 12px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.setting-group select, 
+.setting-group input[type="range"] {
+    width: 100%;
+    background: #0f172a;
+    border: 1px solid #334155;
+    color: white;
+    padding: 10px;
+    border-radius: 8px;
+    outline: none;
+    font-size: 0.85rem;
+}
+
+/* Grid Pemilihan Saiz */
+.size-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+}
+
+.size-box {
+    background: #0f172a;
+    padding: 12px 5px;
+    text-align: center;
+    font-size: 0.7rem;
+    border-radius: 8px;
+    cursor: pointer;
+    border: 1px solid #334155;
+    transition: var(--transition-smooth);
+}
+
+.size-box:hover {
+    border-color: var(--accent-blue);
+}
+
+.size-box.active {
+    border-color: var(--accent-blue);
+    background: rgba(59, 130, 246, 0.1);
+    color: var(--accent-blue);
+    font-weight: bold;
+}
+
+.btn-pro {
+    margin-top: auto;
+    background: linear-gradient(45deg, #3b82f6, #8b5cf6);
+    border: none;
+    padding: 14px;
+    border-radius: 12px;
+    color: white;
+    font-weight: 700;
+    cursor: pointer;
+    transition: transform 0.2s ease;
+}
+
+.btn-pro:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 20px rgba(59, 130, 246, 0.3);
+}
+
+/* --- KAWASAN UTAMA (CANVAS) --- */
+.main-content {
+    flex-grow: 1;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    min-height: 100vh;
-    background-color: var(--bg-color);
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-    -webkit-font-smoothing: antialiased;
-}
-
-/* Bekas Utama */
-.container {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    perspective: 1000px; /* Memberi kesan 3D jika perlu */
-}
-
-/* Kad Mockup UI Modern */
-.mockup-card {
-    background-color: var(--card-color);
-    width: 280px;  /* Nisbah yang lebih langsing mengikut gambar */
-    height: 380px;
-    border-radius: 35px; /* Penjuru lebih bulat (lebih moden) */
-    box-shadow: var(--shadow-deep);
+    padding: 40px;
+    background-image: radial-gradient(circle at center, var(--bg-canvas) 0%, var(--bg-dark) 100%);
     position: relative;
-    padding: 25px;
+}
+
+/* Kad Mockup UI (Elemen Asal Anda) */
+.mockup-card {
+    background-color: var(--card-krim);
+    width: 100%;
+    max-width: 480px;
+    height: 580px;
+    border-radius: 35px;
+    padding: 30px;
     display: flex;
     flex-direction: column;
+    box-shadow: var(--shadow-premium);
     transition: var(--transition-smooth);
-    border: 1px solid rgba(255, 255, 255, 0.1); /* Garis halus di sekeliling */
+    position: relative;
 }
 
-/* Kesan Hover pada Kad */
 .mockup-card:hover {
-    transform: translateY(-12px) scale(1.03);
-    box-shadow: 0 30px 45px -10px rgba(0, 0, 0, 0.4);
+    transform: translateY(-5px);
 }
 
-/* Bahagian Titik Navigasi (Browser Mockup) */
+/* Titik Navigasi Mockup */
 .browser-dots {
     display: flex;
     gap: 8px;
-    margin-bottom: 20px;
+    margin-bottom: 25px;
 }
 
 .dot {
@@ -69,39 +171,99 @@ body {
     height: 11px;
     background-color: var(--dot-color);
     border-radius: 50%;
+    opacity: 0.6;
+}
+
+/* Area Imej / Content */
+.image-area {
+    flex-grow: 1;
+    background: #e5e7eb; /* Kelabu cair sebelum imej muncul */
+    border-radius: 20px;
+    margin-bottom: 25px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: #64748b;
+    border: 1px dashed rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    position: relative;
+    background-size: cover;
+    background-position: center;
+}
+
+/* Prompt Bar (Gaya Playground) */
+.prompt-bar {
+    display: flex;
+    gap: 12px;
+    background: white;
+    padding: 8px;
+    border-radius: 18px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+    border: 1px solid #e2e8f0;
+}
+
+.prompt-bar input {
+    flex-grow: 1;
+    border: none;
+    outline: none;
+    padding: 10px 15px;
+    font-size: 0.9rem;
+    color: #1e293b;
+    background: transparent;
+}
+
+.prompt-bar button {
+    background: var(--bg-dark);
+    color: white;
+    border: none;
+    padding: 10px 22px;
+    border-radius: 12px;
+    cursor: pointer;
+    font-weight: 600;
     transition: var(--transition-smooth);
-    opacity: 0.7;
 }
 
-/* Animasi titik bila kad di-hover */
-.mockup-card:hover .dot {
-    opacity: 1;
+.prompt-bar button:hover {
+    background: var(--accent-blue);
 }
 
-/* Elemen Dekoratif di dalam kad (Garis Placeholder) */
-.card-content-skeleton {
-    margin-top: auto;
-    width: 40px;
-    height: 4px;
-    background-color: rgba(0, 0, 0, 0.05);
-    border-radius: 10px;
-}
-
-/* Label Teks di Bawah */
+/* Label Teks di Bawah Kad */
 .label {
-    margin-top: 40px;
-    color: var(--text-color);
+    margin-top: 30px;
+    color: rgba(255, 255, 255, 0.4);
     letter-spacing: 3px;
     font-size: 0.7rem;
     font-weight: 600;
     text-transform: uppercase;
-    text-align: center;
+}
+
+/* Loading Spinner */
+.spinner {
+    width: 40px;
+    height: 40px;
+    border: 4px solid rgba(59, 130, 246, 0.1);
+    border-top-color: var(--accent-blue);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin-bottom: 15px;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+.hidden {
+    display: none;
 }
 
 /* Responsif untuk Mobile */
-@media (max-width: 480px) {
+@media (max-width: 768px) {
+    .sidebar {
+        display: none; /* Sembunyikan sidebar di mobile untuk fokus pada kad */
+    }
     .mockup-card {
-        width: 240px;
-        height: 340px;
+        max-width: 320px;
+        height: 450px;
     }
 }
