@@ -130,6 +130,31 @@
             cursor: pointer;
         }
 
+        /* --- RATIO BUTTONS STYLE --- */
+        .ratio-buttons {
+            display: flex;
+            gap: 8px;
+            margin-top: 8px;
+        }
+
+        .btn-ratio {
+            flex: 1;
+            background: #0f172a;
+            border: 1px solid #334155;
+            color: white;
+            padding: 8px;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-ratio:hover { border-color: var(--accent-blue); }
+        .btn-ratio.active {
+            background: var(--accent-blue);
+            border-color: var(--accent-blue);
+        }
+
         /* --- CANVAS / MAIN CONTENT --- */
         .main-content {
             flex-grow: 1;
@@ -146,14 +171,14 @@
             background-color: var(--off-white);
             width: 100%;
             max-width: 450px;
-            height: 550px;
+            height: 550px; /* Default height */
             border-radius: 35px;
             padding: 24px;
             display: flex;
             flex-direction: column;
             box-shadow: 0 40px 80px -15px rgba(0, 0, 0, 0.6);
             position: relative;
-            transition: all 0.3s ease;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         .image-area {
@@ -169,7 +194,6 @@
             border: 1px dashed rgba(0,0,0,0.1);
         }
 
-        /* TEXT LAYER STYLE */
         .text-layer {
             position: absolute;
             cursor: move;
@@ -252,6 +276,15 @@
                 <input type="number" id="fontSize" class="input-dark" value="24" min="10" max="100">
                 <input type="color" id="textColor" class="h-10 w-20 bg-transparent border-none cursor-pointer" value="#1e293b">
             </div>
+        </div>
+
+        <div class="setting-group ratio-settings">
+            <label>Nisbah Kanvas:</label>
+            <div class="ratio-buttons">
+                <button type="button" class="btn-ratio active" data-ratio="1/1">1:1</button>
+                <button type="button" class="btn-ratio" data-ratio="4/3">4:3</button>
+                <button type="button" class="btn-ratio" data-ratio="16/9">16:9</button>
+            </div>
             <p class="text-[10px] text-slate-500 mt-2">*Tip: Klik 2x teks untuk padam</p>
         </div>
 
@@ -280,6 +313,7 @@
 <script>
     document.addEventListener('DOMContentLoaded', () => {
         const canvasArea = document.getElementById('canvasArea');
+        const mainCard = document.getElementById('mainCard');
         const previewList = document.getElementById('previewList');
         const fileInput = document.getElementById('fileInput');
         const uploadZone = document.getElementById('uploadZone');
@@ -288,7 +322,30 @@
         
         let selectedElement = null;
 
-        // 1. Logik Upload Gambar
+        // 1. Logik Nisbah (Ratio)
+        const ratioButtons = document.querySelectorAll('.btn-ratio');
+        ratioButtons.forEach(btn => {
+            btn.onclick = () => {
+                ratioButtons.forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                
+                const ratio = btn.getAttribute('data-ratio');
+                const maxWidth = 450;
+
+                if (ratio === "1/1") {
+                    mainCard.style.width = maxWidth + 'px';
+                    mainCard.style.height = maxWidth + 'px';
+                } else if (ratio === "4/3") {
+                    mainCard.style.width = maxWidth + 'px';
+                    mainCard.style.height = (maxWidth * 0.75) + 'px';
+                } else if (ratio === "16/9") {
+                    mainCard.style.width = maxWidth + 'px';
+                    mainCard.style.height = (maxWidth * 0.5625) + 'px';
+                }
+            };
+        });
+
+        // 2. Logik Upload Gambar
         uploadZone.onclick = () => fileInput.click();
         fileInput.onchange = (e) => {
             const files = e.target.files;
@@ -299,7 +356,7 @@
             }
         };
 
-        // 2. Logik Paste Link
+        // 3. Logik Paste Link
         imageLinkInput.addEventListener('keydown', (e) => {
             if (e.key === 'Enter' && imageLinkInput.value !== "") {
                 addImageToSidebar(imageLinkInput.value);
@@ -328,7 +385,7 @@
             previewList.appendChild(item);
         }
 
-        // 3. Logik Tambah Teks
+        // 4. Logik Tambah Teks
         const btnAddText = document.getElementById('btnAddText');
         const textInput = document.getElementById('textInput');
 
@@ -339,7 +396,6 @@
             textLayer.className = 'text-layer';
             textLayer.innerText = textInput.value;
             
-            // Set initial styles
             textLayer.style.fontFamily = document.getElementById('fontFamily').value;
             textLayer.style.fontSize = document.getElementById('fontSize').value + 'px';
             textLayer.style.color = document.getElementById('textColor').value;
@@ -348,19 +404,15 @@
 
             makeDraggable(textLayer);
 
-            // Double click to delete
             textLayer.ondblclick = () => textLayer.remove();
 
-            // Select on click
             textLayer.addEventListener('mousedown', () => {
                 document.querySelectorAll('.text-layer').forEach(el => el.classList.remove('active'));
                 textLayer.classList.add('active');
                 selectedElement = textLayer;
                 
-                // Update sidebar inputs to match selected text
                 document.getElementById('fontFamily').value = textLayer.style.fontFamily;
                 document.getElementById('fontSize').value = parseInt(textLayer.style.fontSize);
-                // Color conversion if needed, but we'll skip for simplicity
             });
 
             canvasArea.appendChild(textLayer);
@@ -368,7 +420,7 @@
             textInput.value = "";
         };
 
-        // 4. Live Styling Updates
+        // 5. Live Styling Updates
         document.getElementById('fontFamily').onchange = (e) => {
             if (selectedElement) selectedElement.style.fontFamily = e.target.value;
         };
@@ -379,7 +431,7 @@
             if (selectedElement) selectedElement.style.color = e.target.value;
         };
 
-        // 5. Drag Functionality
+        // 6. Drag Functionality
         function makeDraggable(elmnt) {
             let pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
             elmnt.onmousedown = dragMouseDown;
@@ -408,14 +460,13 @@
             }
         }
 
-        // 6. Export Design (html2canvas)
+        // 7. Export Design
         document.getElementById('btnExport').onclick = () => {
-            // Remove selection highlight before capture
             if(selectedElement) selectedElement.classList.remove('active');
             
             html2canvas(document.getElementById('mainCard'), {
                 backgroundColor: null,
-                scale: 2 // High quality
+                scale: 2 
             }).then(canvas => {
                 const link = document.createElement('a');
                 link.download = 'my-design.png';
@@ -424,7 +475,6 @@
             });
         };
 
-        // Deselect when clicking canvas
         canvasArea.onclick = (e) => {
             if (e.target === canvasArea) {
                 document.querySelectorAll('.text-layer').forEach(el => el.classList.remove('active'));
