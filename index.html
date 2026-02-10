@@ -7,6 +7,7 @@
     
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;800&family=Dancing+Script:wght@700&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 
     <style>
         :root {
@@ -175,10 +176,12 @@
             padding: 5px;
             user-select: none;
             white-space: nowrap;
+            touch-action: none;
         }
 
         .text-layer.active {
             outline: 2px dashed var(--accent-blue);
+            background: rgba(59, 130, 246, 0.1);
         }
 
         .browser-dots { display: flex; gap: 8px; margin-bottom: 20px; }
@@ -192,7 +195,10 @@
             border-radius: 8px;
             font-weight: 600;
             margin-top: 10px;
+            transition: opacity 0.2s;
         }
+
+        .btn-add-text:active { opacity: 0.7; }
 
         .btn-pro {
             margin-top: auto;
@@ -200,7 +206,10 @@
             padding: 12px;
             border-radius: 10px;
             font-weight: 600;
+            transition: transform 0.2s;
         }
+
+        .btn-pro:hover { transform: scale(1.02); }
 
         .hidden { display: none !important; }
     </style>
@@ -232,7 +241,7 @@
         </div>
 
         <div class="setting-group">
-            <label>Gaya Teks</label>
+            <label>Gaya Teks Terpilih</label>
             <select id="fontFamily" class="input-dark mb-2">
                 <option value="'Inter', sans-serif">Inter (Modern)</option>
                 <option value="'Georgia', serif">Georgia (Klasik)</option>
@@ -240,12 +249,13 @@
                 <option value="'Dancing Script', cursive">Dancing Script</option>
             </select>
             <div class="flex gap-2">
-                <input type="number" id="fontSize" class="input-dark" value="24">
-                <input type="color" id="textColor" class="h-10 w-20 bg-transparent border-none" value="#1e293b">
+                <input type="number" id="fontSize" class="input-dark" value="24" min="10" max="100">
+                <input type="color" id="textColor" class="h-10 w-20 bg-transparent border-none cursor-pointer" value="#1e293b">
             </div>
+            <p class="text-[10px] text-slate-500 mt-2">*Tip: Klik 2x teks untuk padam</p>
         </div>
 
-        <button class="btn-pro">EXPORT DESIGN</button>
+        <button class="btn-pro" id="btnExport">EXPORT DESIGN</button>
     </aside>
 
     <main class="main-content">
@@ -256,14 +266,14 @@
 
             <div id="canvasArea" class="image-area">
                 <p id="placeholderText" class="text-slate-400 text-sm">Pilih gambar atau tambah teks</p>
-                </div>
+            </div>
 
             <div class="flex gap-2 bg-white p-2 rounded-xl shadow-sm border border-slate-100">
                 <input type="text" class="flex-grow border-none outline-none px-3 text-slate-800 text-sm" placeholder="Nota cepat...">
                 <button class="bg-slate-900 text-white px-4 py-2 rounded-lg text-xs font-bold">SIMPAN</button>
             </div>
         </div>
-        <p class="mt-8 text-slate-500 text-xs tracking-widest uppercase">AI Preview Mode • 1080x1350</p>
+        <p class="mt-8 text-slate-500 text-xs tracking-widest uppercase">AI Preview Mode • High Resolution</p>
     </main>
 </div>
 
@@ -275,6 +285,8 @@
         const uploadZone = document.getElementById('uploadZone');
         const imageLinkInput = document.getElementById('imageLinkInput');
         const placeholderText = document.getElementById('placeholderText');
+        
+        let selectedElement = null;
 
         // 1. Logik Upload Gambar
         uploadZone.onclick = () => fileInput.click();
@@ -287,7 +299,7 @@
             }
         };
 
-        // 2. Logik Paste Link (Enter)
+        // 2. Logik Paste Link
         imageLinkInput.addEventListener('keydown', (e) => {
             if (e.key === 'Enter' && imageLinkInput.value !== "") {
                 addImageToSidebar(imageLinkInput.value);
@@ -295,7 +307,6 @@
             }
         });
 
-        // 3. Tambah Gambar ke Sidebar
         function addImageToSidebar(src) {
             const item = document.createElement('div');
             item.className = 'file-item';
@@ -317,7 +328,7 @@
             previewList.appendChild(item);
         }
 
-        // 4. Logik Tambah Teks & Drag
+        // 3. Logik Tambah Teks
         const btnAddText = document.getElementById('btnAddText');
         const textInput = document.getElementById('textInput');
 
@@ -328,19 +339,28 @@
             textLayer.className = 'text-layer';
             textLayer.innerText = textInput.value;
             
-            // Gaya dari input
+            // Set initial styles
             textLayer.style.fontFamily = document.getElementById('fontFamily').value;
             textLayer.style.fontSize = document.getElementById('fontSize').value + 'px';
             textLayer.style.color = document.getElementById('textColor').value;
-            textLayer.style.left = '50px';
-            textLayer.style.top = '50px';
+            textLayer.style.left = '20px';
+            textLayer.style.top = '20px';
 
-            // Aktifkan fungsi drag
             makeDraggable(textLayer);
 
+            // Double click to delete
+            textLayer.ondblclick = () => textLayer.remove();
+
+            // Select on click
             textLayer.addEventListener('mousedown', () => {
                 document.querySelectorAll('.text-layer').forEach(el => el.classList.remove('active'));
                 textLayer.classList.add('active');
+                selectedElement = textLayer;
+                
+                // Update sidebar inputs to match selected text
+                document.getElementById('fontFamily').value = textLayer.style.fontFamily;
+                document.getElementById('fontSize').value = parseInt(textLayer.style.fontSize);
+                // Color conversion if needed, but we'll skip for simplicity
             });
 
             canvasArea.appendChild(textLayer);
@@ -348,27 +368,69 @@
             textInput.value = "";
         };
 
+        // 4. Live Styling Updates
+        document.getElementById('fontFamily').onchange = (e) => {
+            if (selectedElement) selectedElement.style.fontFamily = e.target.value;
+        };
+        document.getElementById('fontSize').oninput = (e) => {
+            if (selectedElement) selectedElement.style.fontSize = e.target.value + 'px';
+        };
+        document.getElementById('textColor').oninput = (e) => {
+            if (selectedElement) selectedElement.style.color = e.target.value;
+        };
+
+        // 5. Drag Functionality
         function makeDraggable(elmnt) {
             let pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
-            elmnt.onmousedown = (e) => {
+            elmnt.onmousedown = dragMouseDown;
+
+            function dragMouseDown(e) {
                 e.preventDefault();
                 pos3 = e.clientX;
                 pos4 = e.clientY;
-                document.onmouseup = () => {
-                    document.onmouseup = null;
-                    document.onmousemove = null;
-                };
-                document.onmousemove = (e) => {
-                    e.preventDefault();
-                    pos1 = pos3 - e.clientX;
-                    pos2 = pos4 - e.clientY;
-                    pos3 = e.clientX;
-                    pos4 = e.clientY;
-                    elmnt.style.top = (elmnt.offsetTop - pos2) + "px";
-                    elmnt.style.left = (elmnt.offsetLeft - pos1) + "px";
-                };
-            };
+                document.onmouseup = closeDragElement;
+                document.onmousemove = elementDrag;
+            }
+
+            function elementDrag(e) {
+                e.preventDefault();
+                pos1 = pos3 - e.clientX;
+                pos2 = pos4 - e.clientY;
+                pos3 = e.clientX;
+                pos4 = e.clientY;
+                elmnt.style.top = (elmnt.offsetTop - pos2) + "px";
+                elmnt.style.left = (elmnt.offsetLeft - pos1) + "px";
+            }
+
+            function closeDragElement() {
+                document.onmouseup = null;
+                document.onmousemove = null;
+            }
         }
+
+        // 6. Export Design (html2canvas)
+        document.getElementById('btnExport').onclick = () => {
+            // Remove selection highlight before capture
+            if(selectedElement) selectedElement.classList.remove('active');
+            
+            html2canvas(document.getElementById('mainCard'), {
+                backgroundColor: null,
+                scale: 2 // High quality
+            }).then(canvas => {
+                const link = document.createElement('a');
+                link.download = 'my-design.png';
+                link.href = canvas.toDataURL();
+                link.click();
+            });
+        };
+
+        // Deselect when clicking canvas
+        canvasArea.onclick = (e) => {
+            if (e.target === canvasArea) {
+                document.querySelectorAll('.text-layer').forEach(el => el.classList.remove('active'));
+                selectedElement = null;
+            }
+        };
     });
 </script>
 
