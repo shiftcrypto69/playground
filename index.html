@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-    <title>Playground AI | Modern Dashboard Mockup</title>
+    <title>Playground AI | Modern Editor v3.0</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;800&display=swap" rel="stylesheet">
@@ -35,20 +35,21 @@
 
         /* --- SIDEBAR --- */
         .sidebar {
-            width: 280px;
+            width: 300px;
             background-color: var(--sidebar-bg);
             border-right: 1px solid rgba(255, 255, 255, 0.1);
             display: flex;
             flex-direction: column;
             padding: 24px;
             z-index: 10;
+            overflow-y: auto;
         }
 
         .sidebar-header .logo {
             font-size: 1.8rem;
             font-weight: 800;
             color: var(--accent-blue);
-            margin-bottom: 40px;
+            margin-bottom: 30px;
             letter-spacing: -1px;
         }
 
@@ -65,6 +66,48 @@
             text-transform: uppercase;
             letter-spacing: 1px;
         }
+
+        /* UPLOAD ZONE STYLE */
+        .upload-zone {
+            border: 2px dashed #334155;
+            background: #0f172a;
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+
+        .upload-zone:hover {
+            border-color: var(--accent-blue);
+            background: rgba(59, 130, 246, 0.05);
+            color: white;
+        }
+
+        .file-preview-list {
+            margin-top: 15px;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+        }
+
+        .file-item {
+            width: 100%;
+            aspect-ratio: 1;
+            background-size: cover;
+            background-position: center;
+            border-radius: 8px;
+            border: 1px solid rgba(255,255,255,0.1);
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .file-item:hover { transform: scale(1.05); }
 
         .setting-group select, .setting-group input[type="range"] {
             width: 100%;
@@ -100,7 +143,7 @@
         }
 
         .btn-pro {
-            margin-top: auto;
+            margin-top: 20px;
             background: linear-gradient(45deg, #3b82f6, #8b5cf6);
             border: none;
             padding: 12px;
@@ -120,6 +163,7 @@
             justify-content: center;
             background: radial-gradient(circle at center, #1e293b 0%, #0f172a 100%);
             position: relative;
+            padding: 20px;
         }
 
         .mockup-card {
@@ -132,10 +176,10 @@
             display: flex;
             flex-direction: column;
             box-shadow: 0 40px 80px -15px rgba(0, 0, 0, 0.6);
-            transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+            position: relative;
         }
 
-        /* Estetika Browser Dots */
         .browser-dots {
             display: flex;
             gap: 8px;
@@ -150,7 +194,6 @@
             opacity: 0.6;
         }
 
-        /* Area Imej Generatif */
         .image-area {
             flex-grow: 1;
             background: #e5e7eb;
@@ -166,7 +209,19 @@
             position: relative;
         }
 
-        /* Prompt Bar Styles */
+        .drop-overlay {
+            position: absolute;
+            inset: 0;
+            background: rgba(59, 130, 246, 0.8);
+            color: white;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            border-radius: 20px;
+            z-index: 20;
+        }
+
         .prompt-bar {
             display: flex;
             gap: 12px;
@@ -194,20 +249,16 @@
             border-radius: 12px;
             cursor: pointer;
             font-weight: 600;
-            transition: transform 0.2s;
         }
-
-        .prompt-bar button:active { transform: scale(0.95); }
 
         .label {
             margin-top: 30px;
             color: var(--text-muted);
             font-size: 0.75rem;
-            letter-spacing: 0.2em;
+            letter-spacing: 0.1em;
             text-transform: uppercase;
         }
 
-        /* Loader Animation */
         .spinner {
             width: 40px;
             height: 40px;
@@ -218,7 +269,7 @@
         }
 
         @keyframes spin { to { transform: rotate(360deg); } }
-        .hidden { display: none; }
+        .hidden { display: none !important; }
 
     </style>
 </head>
@@ -229,12 +280,21 @@
         <div class="sidebar-header">
             <div class="logo">Playground</div>
         </div>
+
+        <div class="setting-group">
+            <label>Upload Assets</label>
+            <div class="upload-zone" onclick="document.getElementById('file-input').click()">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-bottom: 8px; opacity: 0.5;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                <span>Click to upload</span>
+                <input type="file" id="file-input" hidden accept="image/*" onchange="handleUpload(this)">
+            </div>
+            <div id="file-list" class="file-preview-list"></div>
+        </div>
         
         <div class="setting-group">
             <label>AI Model</label>
             <select>
                 <option>Nano Banana v1</option>
-                <option>Playground v3</option>
                 <option>Stable Diffusion XL</option>
             </select>
         </div>
@@ -265,11 +325,12 @@
             </div>
 
             <div id="image-display" class="image-area">
-                <div id="loader" class="hidden">
+                <div id="loader" class="hidden flex flex-col items-center">
                     <div class="spinner"></div>
                     <p class="mt-4 text-sm font-medium">Generating magic...</p>
                 </div>
-                <p id="placeholder-text" class="px-10 text-center">Describe what you want to see and click generate</p>
+                <div id="drop-overlay" class="drop-overlay">Drop image here</div>
+                <p id="placeholder-text" class="px-10 text-center">Describe what you want or drag an image here</p>
             </div>
 
             <div class="prompt-bar">
@@ -277,11 +338,12 @@
                 <button id="generate-btn" onclick="generateImage()">Generate</button>
             </div>
         </div>
-        <p class="label">Minimalist Design v2.5 • Interactive</p>
+        <p class="label">AI Editor v3.0 • File Support Enabled</p>
     </main>
 </div>
 
 <script>
+    // --- FUNGSI GENERATE (ASAL) ---
     function generateImage() {
         const prompt = document.getElementById('user-prompt').value;
         const loader = document.getElementById('loader');
@@ -297,7 +359,6 @@
         btn.disabled = true;
         btn.style.opacity = "0.5";
 
-        // Simulasi penjanaan imej (2 saat)
         setTimeout(() => {
             loader.classList.add('hidden');
             const randomId = Math.floor(Math.random() * 1000);
@@ -309,8 +370,61 @@
         }, 2000);
     }
 
+    // --- FUNGSI UPLOAD & ASSETS ---
+    function handleUpload(input) {
+        if (input.files && input.files[0]) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                // Tambah ke Sidebar Assets
+                const fileList = document.getElementById('file-list');
+                const newFile = document.createElement('div');
+                newFile.className = 'file-item';
+                newFile.style.backgroundImage = `url(${e.target.result})`;
+                newFile.title = "Click to use this asset";
+                newFile.onclick = () => useImage(e.target.result);
+                fileList.appendChild(newFile);
+
+                // Paparkan di Main Display
+                useImage(e.target.result);
+            };
+            reader.readAsDataURL(input.files[0]);
+        }
+    }
+
+    function useImage(src) {
+        const display = document.getElementById('image-display');
+        const placeholder = document.getElementById('placeholder-text');
+        
+        placeholder.classList.add('hidden');
+        display.style.backgroundImage = `url(${src})`;
+        display.style.backgroundSize = 'cover';
+        display.style.backgroundPosition = 'center';
+    }
+
+    // --- DRAG & DROP LOGIC ---
+    const dropArea = document.getElementById('image-display');
+    const overlay = document.getElementById('drop-overlay');
+
+    dropArea.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        overlay.style.display = 'flex';
+    });
+
+    dropArea.addEventListener('dragleave', () => {
+        overlay.style.display = 'none';
+    });
+
+    dropArea.addEventListener('drop', (e) => {
+        e.preventDefault();
+        overlay.style.display = 'none';
+        const files = e.dataTransfer.files;
+        if (files.length > 0) {
+            handleUpload({ files: files });
+        }
+    });
+
+    // --- FUNGSI TUKAR SAIZ (ASAL) ---
     function setSize(ratio, element) {
-        // Tukar status butang aktif
         document.querySelectorAll('.size-box').forEach(box => box.classList.remove('active'));
         element.classList.add('active');
 
