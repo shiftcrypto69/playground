@@ -1,4 +1,4 @@
-/* script.js - Logik Editor: Upload, Paste Link, & Text Editor */
+/* script.js - Logik Editor: Upload, Paste Link, Text Editor & Canvas Ratio */
 
 document.addEventListener('DOMContentLoaded', () => {
     const canvasArea = document.getElementById('canvasArea');
@@ -82,6 +82,8 @@ document.addEventListener('DOMContentLoaded', () => {
         textLayer.style.color = textColor.value;
         textLayer.style.left = '20px';
         textLayer.style.top = '20px';
+        textLayer.style.position = 'absolute';
+        textLayer.style.cursor = 'move';
 
         makeElementDraggable(textLayer);
 
@@ -136,13 +138,8 @@ document.addEventListener('DOMContentLoaded', () => {
             pos3 = e.clientX;
             pos4 = e.clientY;
             
-            // Pengiraan posisi baru
-            let newTop = elmnt.offsetTop - pos2;
-            let newLeft = elmnt.offsetLeft - pos1;
-
-            // Kekalkan dalam sempadan kanvas (Opsional)
-            elmnt.style.top = newTop + "px";
-            elmnt.style.left = newLeft + "px";
+            elmnt.style.top = (elmnt.offsetTop - pos2) + "px";
+            elmnt.style.left = (elmnt.offsetLeft - pos1) + "px";
         }
 
         function closeDragElement() {
@@ -150,6 +147,34 @@ document.addEventListener('DOMContentLoaded', () => {
             document.onmousemove = null;
         }
     }
+
+    // --- 6. FUNGSI ADJUST RATIO KANVAS ---
+    const ratioButtons = document.querySelectorAll('.btn-ratio');
+
+    ratioButtons.forEach(btn => {
+        btn.onclick = () => {
+            const ratio = btn.getAttribute('data-ratio');
+            
+            // Buang kelas aktif dari butang lain
+            ratioButtons.forEach(b => b.classList.remove('active-ratio'));
+            btn.classList.add('active-ratio');
+
+            // Tukar saiz kanvas berdasarkan nisbah
+            if (ratio === '1/1') {
+                canvasArea.style.aspectRatio = "1 / 1";
+                canvasArea.style.width = "100%";
+                canvasArea.style.maxWidth = "500px";
+            } else if (ratio === '4/3') {
+                canvasArea.style.aspectRatio = "4 / 3";
+                canvasArea.style.width = "100%";
+                canvasArea.style.maxWidth = "600px";
+            } else if (ratio === '16/9') {
+                canvasArea.style.aspectRatio = "16 / 9";
+                canvasArea.style.width = "100%";
+                canvasArea.style.maxWidth = "700px";
+            }
+        };
+    });
 
     // Helper: Tukar RGB ke HEX untuk input color
     function rgbToHex(rgb) {
@@ -164,7 +189,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Padam Teks dengan butang Delete
     document.addEventListener('keydown', (e) => {
-        if ((e.key === 'Delete' || e.key === 'Backspace') && activeTextLayer && document.activeElement !== textInput && document.activeElement !== imageLinkInput) {
+        if ((e.key === 'Delete' || e.key === 'Backspace') && activeTextLayer && 
+            document.activeElement !== textInput && 
+            document.activeElement !== imageLinkInput) {
             activeTextLayer.remove();
             activeTextLayer = null;
             textInput.value = "";
