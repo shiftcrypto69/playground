@@ -6,7 +6,7 @@
     <title>Playground AI | Modern Editor v3.0</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;800&family=Dancing+Script:wght@700&display=swap" rel="stylesheet">
 
     <style>
         :root {
@@ -35,7 +35,7 @@
 
         /* --- SIDEBAR --- */
         .sidebar {
-            width: 300px;
+            width: 320px;
             background-color: var(--sidebar-bg);
             border-right: 1px solid rgba(255, 255, 255, 0.1);
             display: flex;
@@ -53,40 +53,45 @@
             letter-spacing: -1px;
         }
 
-        .setting-group {
-            margin-bottom: 24px;
-        }
+        .setting-group { margin-bottom: 24px; }
 
         .setting-group label {
             display: block;
             font-size: 0.7rem;
             font-weight: 600;
             color: var(--text-muted);
-            margin-bottom: 12px;
+            margin-bottom: 8px;
             text-transform: uppercase;
             letter-spacing: 1px;
         }
 
-        /* UPLOAD ZONE STYLE */
         .upload-zone {
             border: 2px dashed #334155;
             background: #0f172a;
             border-radius: 12px;
-            padding: 20px;
+            padding: 15px;
             text-align: center;
             cursor: pointer;
             transition: all 0.3s ease;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            font-size: 0.75rem;
             color: var(--text-muted);
+            font-size: 0.75rem;
         }
 
         .upload-zone:hover {
             border-color: var(--accent-blue);
             background: rgba(59, 130, 246, 0.05);
             color: white;
+        }
+
+        .input-dark {
+            width: 100%;
+            background: #0f172a;
+            border: 1px solid #334155;
+            color: white;
+            padding: 10px;
+            border-radius: 8px;
+            outline: none;
+            font-size: 0.85rem;
         }
 
         .file-preview-list {
@@ -97,6 +102,7 @@
         }
 
         .file-item {
+            position: relative;
             width: 100%;
             aspect-ratio: 1;
             background-size: cover;
@@ -104,57 +110,26 @@
             border-radius: 8px;
             border: 1px solid rgba(255,255,255,0.1);
             cursor: pointer;
-            transition: transform 0.2s;
         }
 
-        .file-item:hover { transform: scale(1.05); }
-
-        .setting-group select, .setting-group input[type="range"] {
-            width: 100%;
-            background: #0f172a;
-            border: 1px solid #334155;
+        .btn-delete {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: #ef4444;
             color: white;
-            padding: 10px;
-            border-radius: 8px;
-            outline: none;
-        }
-
-        .size-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 10px;
-        }
-
-        .size-box {
-            background: #0f172a;
-            padding: 12px 5px;
-            text-align: center;
-            font-size: 0.75rem;
-            border-radius: 8px;
-            cursor: pointer;
-            border: 1px solid #334155;
-            transition: 0.2s;
-        }
-
-        .size-box.active {
-            border-color: var(--accent-blue);
-            background: rgba(59, 130, 246, 0.1);
-            color: var(--accent-blue);
-        }
-
-        .btn-pro {
-            margin-top: 20px;
-            background: linear-gradient(45deg, #3b82f6, #8b5cf6);
+            border-radius: 50%;
+            width: 18px;
+            height: 18px;
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             border: none;
-            padding: 12px;
-            border-radius: 10px;
-            color: white;
-            font-weight: 600;
             cursor: pointer;
-            transition: opacity 0.3s;
         }
 
-        /* --- MAIN CONTENT & CANVAS --- */
+        /* --- CANVAS / MAIN CONTENT --- */
         .main-content {
             flex-grow: 1;
             display: flex;
@@ -176,22 +151,8 @@
             display: flex;
             flex-direction: column;
             box-shadow: 0 40px 80px -15px rgba(0, 0, 0, 0.6);
-            transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
             position: relative;
-        }
-
-        .browser-dots {
-            display: flex;
-            gap: 8px;
-            margin-bottom: 20px;
-        }
-
-        .dot {
-            width: 10px;
-            height: 10px;
-            background-color: var(--dot-color);
-            border-radius: 50%;
-            opacity: 0.6;
+            transition: all 0.3s ease;
         }
 
         .image-area {
@@ -200,77 +161,48 @@
             border-radius: 20px;
             margin-bottom: 20px;
             display: flex;
-            flex-direction: column;
             align-items: center;
             justify-content: center;
-            color: #64748b;
+            position: relative;
             overflow: hidden;
             border: 1px dashed rgba(0,0,0,0.1);
-            position: relative;
         }
 
-        .drop-overlay {
+        /* TEXT LAYER STYLE */
+        .text-layer {
             position: absolute;
-            inset: 0;
-            background: rgba(59, 130, 246, 0.8);
+            cursor: move;
+            padding: 5px;
+            user-select: none;
+            white-space: nowrap;
+        }
+
+        .text-layer.active {
+            outline: 2px dashed var(--accent-blue);
+        }
+
+        .browser-dots { display: flex; gap: 8px; margin-bottom: 20px; }
+        .dot { width: 10px; height: 10px; background-color: var(--dot-color); border-radius: 50%; opacity: 0.6; }
+
+        .btn-add-text {
+            width: 100%;
+            background: var(--accent-blue);
             color: white;
-            display: none;
-            align-items: center;
-            justify-content: center;
-            font-weight: bold;
-            border-radius: 20px;
-            z-index: 20;
+            padding: 10px;
+            border-radius: 8px;
+            font-weight: 600;
+            margin-top: 10px;
         }
 
-        .prompt-bar {
-            display: flex;
-            gap: 12px;
-            background: white;
-            padding: 8px;
-            border-radius: 18px;
-            box-shadow: 0 10px 20px rgba(0,0,0,0.05);
-            border: 1px solid #e2e8f0;
-        }
-
-        .prompt-bar input {
-            flex-grow: 1;
-            border: none;
-            outline: none;
-            padding: 10px 15px;
-            color: #1e293b;
-            font-size: 0.9rem;
-        }
-
-        .prompt-bar button {
-            background: var(--bg-dark);
-            color: white;
-            border: none;
-            padding: 10px 24px;
-            border-radius: 12px;
-            cursor: pointer;
+        .btn-pro {
+            margin-top: auto;
+            background: linear-gradient(45deg, #3b82f6, #8b5cf6);
+            padding: 12px;
+            border-radius: 10px;
             font-weight: 600;
         }
 
-        .label {
-            margin-top: 30px;
-            color: var(--text-muted);
-            font-size: 0.75rem;
-            letter-spacing: 0.1em;
-            text-transform: uppercase;
-        }
-
-        .spinner {
-            width: 40px;
-            height: 40px;
-            border: 4px solid rgba(59, 130, 246, 0.1);
-            border-top-color: var(--accent-blue);
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-        }
-
-        @keyframes spin { to { transform: rotate(360deg); } }
         .hidden { display: none !important; }
-
     </style>
 </head>
 <body>
@@ -278,168 +210,166 @@
 <div class="dashboard">
     <aside class="sidebar">
         <div class="sidebar-header">
-            <div class="logo">Playground</div>
+            <div class="logo">EDITOR.AI</div>
         </div>
 
         <div class="setting-group">
-            <label>Upload Assets</label>
-            <div class="upload-zone" onclick="document.getElementById('file-input').click()">
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-bottom: 8px; opacity: 0.5;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
-                <span>Click to upload</span>
-                <input type="file" id="file-input" hidden accept="image/*" onchange="handleUpload(this)">
+            <label>Imej & Assets</label>
+            <div class="upload-zone" id="uploadZone">
+                <span>Klik atau seret gambar</span>
+                <input type="file" id="fileInput" hidden accept="image/*" multiple>
             </div>
-            <div id="file-list" class="file-preview-list"></div>
+            <input type="text" id="imageLinkInput" class="input-dark mt-2" placeholder="Paste URL gambar & Enter...">
+            <div id="previewList" class="file-preview-list"></div>
         </div>
-        
+
+        <hr class="opacity-10 mb-6">
+
         <div class="setting-group">
-            <label>AI Model</label>
-            <select>
-                <option>Nano Banana v1</option>
-                <option>Stable Diffusion XL</option>
+            <label>Tambah Teks</label>
+            <input type="text" id="textInput" class="input-dark" placeholder="Tulis sesuatu...">
+            <button class="btn-add-text" id="btnAddText">+ Tambah ke Kanvas</button>
+        </div>
+
+        <div class="setting-group">
+            <label>Gaya Teks</label>
+            <select id="fontFamily" class="input-dark mb-2">
+                <option value="'Inter', sans-serif">Inter (Modern)</option>
+                <option value="'Georgia', serif">Georgia (Klasik)</option>
+                <option value="'Courier New', monospace">Monospace</option>
+                <option value="'Dancing Script', cursive">Dancing Script</option>
             </select>
-        </div>
-
-        <div class="setting-group">
-            <label>Image Dimensions</label>
-            <div class="size-grid">
-                <div class="size-box active" onclick="setSize('1:1', this)">1:1</div>
-                <div class="size-box" onclick="setSize('4:3', this)">4:3</div>
-                <div class="size-box" onclick="setSize('16:9', this)">16:9</div>
+            <div class="flex gap-2">
+                <input type="number" id="fontSize" class="input-dark" value="24">
+                <input type="color" id="textColor" class="h-10 w-20 bg-transparent border-none" value="#1e293b">
             </div>
         </div>
 
-        <div class="setting-group">
-            <label>Guidance Scale: <span id="val-display">7</span></label>
-            <input type="range" min="1" max="20" value="7" oninput="document.getElementById('val-display').innerText = this.value">
-        </div>
-
-        <button class="btn-pro">Upgrade to Pro</button>
+        <button class="btn-pro">EXPORT DESIGN</button>
     </aside>
 
     <main class="main-content">
-        <div class="mockup-card" id="main-card">
+        <div class="mockup-card" id="mainCard">
             <div class="browser-dots">
-                <div class="dot"></div>
-                <div class="dot"></div>
-                <div class="dot"></div>
+                <div class="dot"></div><div class="dot"></div><div class="dot"></div>
             </div>
 
-            <div id="image-display" class="image-area">
-                <div id="loader" class="hidden flex flex-col items-center">
-                    <div class="spinner"></div>
-                    <p class="mt-4 text-sm font-medium">Generating magic...</p>
+            <div id="canvasArea" class="image-area">
+                <p id="placeholderText" class="text-slate-400 text-sm">Pilih gambar atau tambah teks</p>
                 </div>
-                <div id="drop-overlay" class="drop-overlay">Drop image here</div>
-                <p id="placeholder-text" class="px-10 text-center">Describe what you want or drag an image here</p>
-            </div>
 
-            <div class="prompt-bar">
-                <input type="text" id="user-prompt" placeholder="A futuristic city with neon lights..." />
-                <button id="generate-btn" onclick="generateImage()">Generate</button>
+            <div class="flex gap-2 bg-white p-2 rounded-xl shadow-sm border border-slate-100">
+                <input type="text" class="flex-grow border-none outline-none px-3 text-slate-800 text-sm" placeholder="Nota cepat...">
+                <button class="bg-slate-900 text-white px-4 py-2 rounded-lg text-xs font-bold">SIMPAN</button>
             </div>
         </div>
-        <p class="label">AI Editor v3.0 • File Support Enabled</p>
+        <p class="mt-8 text-slate-500 text-xs tracking-widest uppercase">AI Preview Mode • 1080x1350</p>
     </main>
 </div>
 
 <script>
-    // --- FUNGSI GENERATE (ASAL) ---
-    function generateImage() {
-        const prompt = document.getElementById('user-prompt').value;
-        const loader = document.getElementById('loader');
-        const placeholder = document.getElementById('placeholder-text');
-        const display = document.getElementById('image-display');
-        const btn = document.getElementById('generate-btn');
+    document.addEventListener('DOMContentLoaded', () => {
+        const canvasArea = document.getElementById('canvasArea');
+        const previewList = document.getElementById('previewList');
+        const fileInput = document.getElementById('fileInput');
+        const uploadZone = document.getElementById('uploadZone');
+        const imageLinkInput = document.getElementById('imageLinkInput');
+        const placeholderText = document.getElementById('placeholderText');
 
-        if(!prompt) return alert("Sila masukkan huraian (prompt)!");
+        // 1. Logik Upload Gambar
+        uploadZone.onclick = () => fileInput.click();
+        fileInput.onchange = (e) => {
+            const files = e.target.files;
+            for (let file of files) {
+                const reader = new FileReader();
+                reader.onload = (event) => addImageToSidebar(event.target.result);
+                reader.readAsDataURL(file);
+            }
+        };
 
-        placeholder.classList.add('hidden');
-        loader.classList.remove('hidden');
-        display.style.backgroundImage = 'none';
-        btn.disabled = true;
-        btn.style.opacity = "0.5";
+        // 2. Logik Paste Link (Enter)
+        imageLinkInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' && imageLinkInput.value !== "") {
+                addImageToSidebar(imageLinkInput.value);
+                imageLinkInput.value = "";
+            }
+        });
 
-        setTimeout(() => {
-            loader.classList.add('hidden');
-            const randomId = Math.floor(Math.random() * 1000);
-            display.style.backgroundImage = `url('https://picsum.photos/seed/${randomId}/800/800')`;
-            display.style.backgroundSize = 'cover';
-            display.style.backgroundPosition = 'center';
-            btn.disabled = false;
-            btn.style.opacity = "1";
-        }, 2000);
-    }
+        // 3. Tambah Gambar ke Sidebar
+        function addImageToSidebar(src) {
+            const item = document.createElement('div');
+            item.className = 'file-item';
+            item.style.backgroundImage = `url('${src}')`;
 
-    // --- FUNGSI UPLOAD & ASSETS ---
-    function handleUpload(input) {
-        if (input.files && input.files[0]) {
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                // Tambah ke Sidebar Assets
-                const fileList = document.getElementById('file-list');
-                const newFile = document.createElement('div');
-                newFile.className = 'file-item';
-                newFile.style.backgroundImage = `url(${e.target.result})`;
-                newFile.title = "Click to use this asset";
-                newFile.onclick = () => useImage(e.target.result);
-                fileList.appendChild(newFile);
+            const delBtn = document.createElement('button');
+            delBtn.className = 'btn-delete';
+            delBtn.innerHTML = '×';
+            delBtn.onclick = (e) => { e.stopPropagation(); item.remove(); };
 
-                // Paparkan di Main Display
-                useImage(e.target.result);
+            item.onclick = () => {
+                canvasArea.style.backgroundImage = `url('${src}')`;
+                canvasArea.style.backgroundSize = 'cover';
+                canvasArea.style.backgroundPosition = 'center';
+                placeholderText.classList.add('hidden');
             };
-            reader.readAsDataURL(input.files[0]);
+
+            item.appendChild(delBtn);
+            previewList.appendChild(item);
         }
-    }
 
-    function useImage(src) {
-        const display = document.getElementById('image-display');
-        const placeholder = document.getElementById('placeholder-text');
-        
-        placeholder.classList.add('hidden');
-        display.style.backgroundImage = `url(${src})`;
-        display.style.backgroundSize = 'cover';
-        display.style.backgroundPosition = 'center';
-    }
+        // 4. Logik Tambah Teks & Drag
+        const btnAddText = document.getElementById('btnAddText');
+        const textInput = document.getElementById('textInput');
 
-    // --- DRAG & DROP LOGIC ---
-    const dropArea = document.getElementById('image-display');
-    const overlay = document.getElementById('drop-overlay');
+        btnAddText.onclick = () => {
+            if (textInput.value.trim() === "") return;
 
-    dropArea.addEventListener('dragover', (e) => {
-        e.preventDefault();
-        overlay.style.display = 'flex';
-    });
+            const textLayer = document.createElement('div');
+            textLayer.className = 'text-layer';
+            textLayer.innerText = textInput.value;
+            
+            // Gaya dari input
+            textLayer.style.fontFamily = document.getElementById('fontFamily').value;
+            textLayer.style.fontSize = document.getElementById('fontSize').value + 'px';
+            textLayer.style.color = document.getElementById('textColor').value;
+            textLayer.style.left = '50px';
+            textLayer.style.top = '50px';
 
-    dropArea.addEventListener('dragleave', () => {
-        overlay.style.display = 'none';
-    });
+            // Aktifkan fungsi drag
+            makeDraggable(textLayer);
 
-    dropArea.addEventListener('drop', (e) => {
-        e.preventDefault();
-        overlay.style.display = 'none';
-        const files = e.dataTransfer.files;
-        if (files.length > 0) {
-            handleUpload({ files: files });
+            textLayer.addEventListener('mousedown', () => {
+                document.querySelectorAll('.text-layer').forEach(el => el.classList.remove('active'));
+                textLayer.classList.add('active');
+            });
+
+            canvasArea.appendChild(textLayer);
+            placeholderText.classList.add('hidden');
+            textInput.value = "";
+        };
+
+        function makeDraggable(elmnt) {
+            let pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
+            elmnt.onmousedown = (e) => {
+                e.preventDefault();
+                pos3 = e.clientX;
+                pos4 = e.clientY;
+                document.onmouseup = () => {
+                    document.onmouseup = null;
+                    document.onmousemove = null;
+                };
+                document.onmousemove = (e) => {
+                    e.preventDefault();
+                    pos1 = pos3 - e.clientX;
+                    pos2 = pos4 - e.clientY;
+                    pos3 = e.clientX;
+                    pos4 = e.clientY;
+                    elmnt.style.top = (elmnt.offsetTop - pos2) + "px";
+                    elmnt.style.left = (elmnt.offsetLeft - pos1) + "px";
+                };
+            };
         }
     });
-
-    // --- FUNGSI TUKAR SAIZ (ASAL) ---
-    function setSize(ratio, element) {
-        document.querySelectorAll('.size-box').forEach(box => box.classList.remove('active'));
-        element.classList.add('active');
-
-        const card = document.getElementById('main-card');
-        if(ratio === '1:1') {
-            card.style.maxWidth = '450px';
-            card.style.height = '550px';
-        } else if(ratio === '4:3') {
-            card.style.maxWidth = '550px';
-            card.style.height = '500px';
-        } else if(ratio === '16:9') {
-            card.style.maxWidth = '700px';
-            card.style.height = '450px';
-        }
-    }
 </script>
 
 </body>
