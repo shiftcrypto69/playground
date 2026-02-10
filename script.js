@@ -7,9 +7,20 @@ document.addEventListener('DOMContentLoaded', () => {
     const uploadZone = document.getElementById('uploadZone');
     const imageLinkInput = document.getElementById('imageLinkInput');
     const placeholderText = document.getElementById('placeholderText');
+    
+    // Elemen Kawalan Teks
+    const btnAddText = document.getElementById('btnAddText');
+    const textInput = document.getElementById('textInput');
+    const fontFamily = document.getElementById('fontFamily');
+    const fontSize = document.getElementById('fontSize');
+    const textColor = document.getElementById('textColor');
+
+    let activeTextLayer = null;
 
     // --- 1. FUNGSI MUAT NAIK GAMBAR (UPLOAD) ---
-    uploadZone.onclick = () => fileInput.click();
+    if (uploadZone) {
+        uploadZone.onclick = () => fileInput.click();
+    }
 
     fileInput.onchange = (e) => {
         const files = e.target.files;
@@ -28,7 +39,7 @@ document.addEventListener('DOMContentLoaded', () => {
     imageLinkInput.addEventListener('keydown', (e) => {
         if (e.key === 'Enter' && imageLinkInput.value !== "") {
             addImageToSidebar(imageLinkInput.value);
-            imageLinkInput.value = ""; // Kosongkan input
+            imageLinkInput.value = ""; 
         }
     });
 
@@ -38,7 +49,6 @@ document.addEventListener('DOMContentLoaded', () => {
         item.className = 'file-item';
         item.style.backgroundImage = `url('${src}')`;
 
-        // Butang Buang (X)
         const delBtn = document.createElement('button');
         delBtn.className = 'btn-delete';
         delBtn.innerHTML = '×';
@@ -47,11 +57,11 @@ document.addEventListener('DOMContentLoaded', () => {
             item.remove();
         };
 
-        // Klik gambar di sidebar untuk letak di kanvas
         item.onclick = () => {
             canvasArea.style.backgroundImage = `url('${src}')`;
             canvasArea.style.backgroundSize = 'cover';
-            placeholderText.classList.add('hidden');
+            canvasArea.style.backgroundPosition = 'center';
+            if (placeholderText) placeholderText.classList.add('hidden');
         };
 
         item.appendChild(delBtn);
@@ -59,12 +69,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // --- 4. FUNGSI EDITOR TEKS ---
-    const btnAddText = document.getElementById('btnAddText');
-    const textInput = document.getElementById('textInput');
-    const fontFamily = document.getElementById('fontFamily');
-    const fontSize = document.getElementById('fontSize');
-    const textColor = document.getElementById('textColor');
-
     btnAddText.onclick = () => {
         if (textInput.value.trim() === "") return;
 
@@ -76,32 +80,47 @@ document.addEventListener('DOMContentLoaded', () => {
         textLayer.style.fontFamily = fontFamily.value;
         textLayer.style.fontSize = fontSize.value + 'px';
         textLayer.style.color = textColor.value;
-        textLayer.style.left = '50px';
-        textLayer.style.top = '50px';
+        textLayer.style.left = '20px';
+        textLayer.style.top = '20px';
 
-        // Fungsi Drag (Tarik Teks)
         makeElementDraggable(textLayer);
 
-        // Klik untuk edit semula / aktifkan
         textLayer.addEventListener('mousedown', () => {
-            document.querySelectorAll('.text-layer').forEach(el => el.classList.remove('active'));
-            textLayer.classList.add('active');
-            
-            // Masukkan balik nilai ke sidebar untuk editing
-            textInput.value = textLayer.innerText;
+            setActiveLayer(textLayer);
         });
 
         canvasArea.appendChild(textLayer);
-        placeholderText.classList.add('hidden');
+        if (placeholderText) placeholderText.classList.add('hidden');
         textInput.value = "";
+        setActiveLayer(textLayer);
     };
 
-    // --- 5. LOGIK DRAG & DROP UNTUK TEKS ---
+    // Fungsi Set Aktif (Sync Sidebar & Kanvas)
+    function setActiveLayer(layer) {
+        document.querySelectorAll('.text-layer').forEach(el => el.classList.remove('active'));
+        activeTextLayer = layer;
+        activeTextLayer.classList.add('active');
+        
+        // Sync nilai sidebar dengan lapisan yang dipilih
+        textInput.value = activeTextLayer.innerText;
+        fontFamily.value = activeTextLayer.style.fontFamily;
+        fontSize.value = parseInt(activeTextLayer.style.fontSize);
+        textColor.value = rgbToHex(activeTextLayer.style.color);
+    }
+
+    // Kemaskini Teks Secara Real-time
+    textInput.oninput = () => { if (activeTextLayer) activeTextLayer.innerText = textInput.value; };
+    fontFamily.onchange = () => { if (activeTextLayer) activeTextLayer.style.fontFamily = fontFamily.value; };
+    fontSize.oninput = () => { if (activeTextLayer) activeTextLayer.style.fontSize = fontSize.value + 'px'; };
+    textColor.oninput = () => { if (activeTextLayer) activeTextLayer.style.color = textColor.value; };
+
+    // --- 5. LOGIK DRAG & DROP ---
     function makeElementDraggable(elmnt) {
         let pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
         elmnt.onmousedown = dragMouseDown;
 
         function dragMouseDown(e) {
+            e = e || window.event;
             e.preventDefault();
             pos3 = e.clientX;
             pos4 = e.clientY;
@@ -110,13 +129,20 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         function elementDrag(e) {
+            e = e || window.event;
             e.preventDefault();
             pos1 = pos3 - e.clientX;
             pos2 = pos4 - e.clientY;
             pos3 = e.clientX;
             pos4 = e.clientY;
-            elmnt.style.top = (elmnt.offsetTop - pos2) + "px";
-            elmnt.style.left = (elmnt.offsetLeft - pos1) + "px";
+            
+            // Pengiraan posisi baru
+            let newTop = elmnt.offsetTop - pos2;
+            let newLeft = elmnt.offsetLeft - pos1;
+
+            // Kekalkan dalam sempadan kanvas (Opsional)
+            elmnt.style.top = newTop + "px";
+            elmnt.style.left = newLeft + "px";
         }
 
         function closeDragElement() {
@@ -124,4 +150,24 @@ document.addEventListener('DOMContentLoaded', () => {
             document.onmousemove = null;
         }
     }
+
+    // Helper: Tukar RGB ke HEX untuk input color
+    function rgbToHex(rgb) {
+        if (!rgb || rgb.startsWith('#')) return rgb;
+        const rgbValues = rgb.match(/\d+/g);
+        if (!rgbValues) return '#000000';
+        return "#" + rgbValues.map(x => {
+            const hex = parseInt(x).toString(16);
+            return hex.length === 1 ? "0" + hex : hex;
+        }).join("");
+    }
+
+    // Padam Teks dengan butang Delete
+    document.addEventListener('keydown', (e) => {
+        if ((e.key === 'Delete' || e.key === 'Backspace') && activeTextLayer && document.activeElement !== textInput && document.activeElement !== imageLinkInput) {
+            activeTextLayer.remove();
+            activeTextLayer = null;
+            textInput.value = "";
+        }
+    });
 });
